@@ -5,7 +5,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -23,15 +24,20 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Install Flet
-        run: pip install flet
+      - name: Install Dependencies
+        run: |
+          pip install flet
+          # Se você tiver um arquivo de requisitos, descomente a linha abaixo:
+          # pip install -r requirements.txt
 
-      - name: Build APK
-        run: flet build apk
+      - name: Flet Build APK
+        run: |
+          # Adicionamos o verbose para detalhar erros se o build falhar
+          flet build apk --verbose
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: meu-app-final
-          # O Flet costuma gerar o APK dentro de build/apk ou dist/apk
+          # Ajuste do caminho: o Flet 0.22+ gera na pasta build/apk
           path: build/apk/*.apk
