@@ -8,36 +8,39 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-      - name: Install Dependencies
+      - name: Install Flet and Dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install flet
-          # Se você tiver um arquivo de requisitos, descomente a linha abaixo:
-          # pip install -r requirements.txt
+          # Se tiveres um ficheiro requirements.txt, ele será instalado aqui
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Flet Build APK
         run: |
-          # Adicionamos o verbose para detalhar erros se o build falhar
+          # O comando 'flet build apk' compila o projeto
+          # Adicionamos o verbose para identificar erros nos logs do GitHub
           flet build apk --verbose
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: meu-app-final
-          # Ajuste do caminho: o Flet 0.22+ gera na pasta build/apk
+          # O caminho padrão onde o Flet guarda o APK gerado
           path: build/apk/*.apk
+          if-no-files-found: error
