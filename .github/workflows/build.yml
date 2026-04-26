@@ -1,12 +1,16 @@
 name: Build APK
 on: [push]
 
+# Define a variável de ambiente globalmente para o workflow
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # v4 já suporta Node 24 em runners atualizados
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -15,7 +19,7 @@ jobs:
           java-version: '17'
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5 # Atualizado para v5
         with:
           python-version: '3.11'
 
@@ -28,19 +32,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flet
-          # Se tiveres um ficheiro requirements.txt, ele será instalado aqui
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Flet Build APK
         run: |
-          # O comando 'flet build apk' compila o projeto
-          # Adicionamos o verbose para identificar erros nos logs do GitHub
+          # O verbose ajuda a identificar falhas se a tela preta persistir
           flet build apk --verbose
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4 # v4 é a mais estável para Node 24
         with:
           name: meu-app-final
-          # O caminho padrão onde o Flet guarda o APK gerado
           path: build/apk/*.apk
           if-no-files-found: error
