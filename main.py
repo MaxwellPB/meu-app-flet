@@ -1,99 +1,63 @@
 import flet as ft
 
 def main(page: ft.Page):
+    # Configurações essenciais para evitar erros de renderização
+    page.title = "Teste de Interface"
     page.theme_mode = ft.ThemeMode.DARK
-    page.padding = 20
-    page.spacing = 20
+    page.padding = 15
+    # O scroll deve estar na página ou em um container pai
+    page.scroll = ft.ScrollMode.ADAPTIVE 
 
-    # 1. Elemento Gráfico: Header com Avatar e Saudação
-    header = ft.Container(
-        content=ft.Row(
-            controls=[
-                ft.Column([
-                    ft.Text("Olá, Desenvolvedor!", size=24, weight="bold", color="white"),
-                    ft.Text("Confira o status dos seus registros hoje.", size=14, color="grey"),
-                ], expand=True),
-                ft.CircleAvatar(
-                    content=ft.Icon(ft.icons.PERSON),
-                    bgcolor=ft.colors.BLUE_700,
-                    radius=25,
-                )
-            ],
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-        ),
-        margin=ft.margin.only(bottom=10)
+    # 1. Header Simples (Sem muitos elementos)
+    header = ft.Text(
+        "Painel de Controle",
+        size=28,
+        weight=ft.FontWeight.BOLD,
+        color=ft.colors.BLUE_500
     )
 
-    # 2. Elemento Gráfico: Mini Dashboard (Indicadores)
-    stats_row = ft.Row(
-        controls=[
-            ft.Container(
-                content=ft.Column([
-                    ft.Icon(ft.icons.AUTO_GRAPH, color=ft.colors.GREEN_400),
-                    ft.Text("Atividade", size=12),
-                    ft.Text("85%", size=18, weight="bold")
-                ]),
-                padding=15,
-                bgcolor=ft.colors.with_opacity(0.1, ft.colors.WHITE),
-                border_radius=15,
-                expand=True
-            ),
-            ft.Container(
-                content=ft.Column([
-                    ft.Icon(ft.icons.LAYERS, color=ft.colors.BLUE_400),
-                    ft.Text("Registros", size=12),
-                    ft.Text("124", size=18, weight="bold")
-                ]),
-                padding=15,
-                bgcolor=ft.colors.with_opacity(0.1, ft.colors.WHITE),
-                border_radius=15,
-                expand=True
-            ),
-        ],
-        spacing=15
-    )
+    # 2. Elemento Gráfico: Barra de progresso (Visual e leve)
+    # Isso ajuda a ver se a interface está "viva"
+    progress_section = ft.Column([
+        ft.Text("Capacidade do Sistema", size=14, color=ft.colors.GREY_400),
+        ft.ProgressBar(value=0.6, color=ft.colors.BLUE_ACCENT, bgcolor=ft.colors.GREY_800),
+    ], spacing=5)
 
-    # 3. Card de Registro Refinado (Sem retângulos pesados)
-    def create_card(titulo, subtitulo):
+    # 3. Card de Registro (Simplificado e com cores sólidas)
+    # Evitamos sombras complexas no primeiro teste de APK
+    def create_simple_card(titulo, status):
         return ft.Container(
-            content=ft.Row([
-                ft.Container(
-                    width=5, height=40, bgcolor=ft.colors.BLUE_ACCENT, border_radius=10
-                ),
-                ft.Column([
-                    ft.Text(titulo, weight="bold", size=16),
-                    ft.Text(subtitulo, size=13, color="grey"),
-                ], tight=True, expand=True),
-                ft.IconButton(icon=ft.icons.MORE_VERT, icon_color="grey")
-            ]),
-            padding=15,
-            bgcolor=ft.colors.SURFACE_VARIANT,
-            border_radius=12,
-            # Sombra suave para profundidade
-            shadow=ft.BoxShadow(
-                spread_radius=1, blur_radius=10, 
-                color=ft.colors.with_opacity(0.2, ft.colors.BLACK)
-            )
+            content=ft.ListTile(
+                leading=ft.Icon(ft.icons.REORDER, color=ft.colors.BLUE_200),
+                title=ft.Text(titulo, size=16, weight="bold"),
+                subtitle=ft.Text(status, size=13, color=ft.colors.GREY_400),
+                trailing=ft.Icon(ft.icons.CHEVRON_RIGHT),
+            ),
+            bgcolor=ft.colors.GREY_900,
+            border_radius=10,
+            border=ft.border.all(1, ft.colors.GREY_800),
+            margin=ft.margin.only(bottom=10)
         )
 
-    # Lista de Registros
-    lista_registros = ft.Column(
-        controls=[
-            create_card("Relatório Mensal", "Atualizado há 2 horas"),
-            create_card("Backup de Dados", "Concluído com sucesso"),
-            create_card("Configurações de UI", "Pendente de revisão"),
-        ],
-        spacing=10,
-        scroll=ft.ScrollMode.ADAPTIVE # Garante que não corte no mobile
-    )
+    # Lista de elementos
+    registros = ft.Column([
+        create_simple_card("Registro de Entrada", "Processado"),
+        create_simple_card("Configuração de Rede", "Ativo"),
+        create_simple_card("Banco de Dados", "Sincronizado"),
+    ])
 
-    # Adicionando tudo à página
+    # Adicionando de forma limpa
     page.add(
         header,
-        stats_row,
-        ft.Text("Registros Recentes", size=18, weight="w600", margin=ft.margin.only(top=10)),
-        lista_registros
+        ft.Divider(height=20, color="transparent"),
+        progress_section,
+        ft.Divider(height=20, color="transparent"),
+        ft.Text("Últimas Atividades", size=16, weight="w500"),
+        registros
     )
 
-ft.app(target=main)
+    page.update()
 
+# Importante para o build do Flet:
+if __name__ == "__main__":
+    ft.app(target=main)
